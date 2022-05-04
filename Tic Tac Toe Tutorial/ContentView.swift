@@ -52,6 +52,16 @@ struct ContentView: View {
                 .onChange(of: moves, perform: { value in
                  decideWinner()
                 })
+                .alert(isPresented: $gameOver, content: {
+                    Alert(title: Text("Winner"), message: Text(message), dismissButton: .destructive(Text("Play Again"), action: {
+                        
+                        withAnimation(Animation.easeIn(duration: 0.45)) {
+                        moves.removeAll()
+                        moves = Array(repeating: "", count: 9)
+                        currentUser = false
+                        }
+                    }))
+                })
         }
     }
     var width: CGFloat {
@@ -66,13 +76,23 @@ struct ContentView: View {
             message = "Player O won the game!!"
             self.gameOver.toggle()
         }
+        else {
+            let status = moves.contains {
+                (value) -> Bool in
+                return value == ""
+            }
+            if !status {
+                message = "Game is tie!"
+                gameOver.toggle()
+            }
+        }
     }
     
     func checkMoves(player: String) -> Bool {
         
 //        Horizontal Check
         for i in stride(from: 0, to: 9, by: 3) {
-            if moves[i] == player && moves[i + 1] == player && moves[i + 3] == player {
+            if moves[i] == player && moves[i + 1] == player && moves[i + 2] == player {
                 return true
             }
         }
@@ -85,7 +105,7 @@ struct ContentView: View {
         }
 //        Diagonal Check
         
-        if moves[0] == player && moves[5] == player && moves[8] == player {
+        if moves[0] == player && moves[4] == player && moves[8] == player {
             return true
         }
         if moves[2] == player && moves[4] == player && moves[6] == player {
